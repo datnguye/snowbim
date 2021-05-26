@@ -1,5 +1,5 @@
 def connect():
-    pass
+    pass # TODO
 
 def compare_schema(snow_conn, bim_schema):
     pass

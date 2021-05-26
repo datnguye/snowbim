@@ -8,7 +8,7 @@ def load_bim(file_path:str=None):
     '''
     bim = None
     if os.path.exists(file_path):
-        return (-1, {}, 'File not found')
+        return (-1, {}, f'File not found: {file_path}')
 
     with open(file_path, 'r') as f:
         bim = json.load(f)
@@ -21,10 +21,46 @@ def upgrade_bim(file_path:str=None, out_path:str=None, changes:list=[]):
     Return a tuple (code, dict, messasge)
     '''
     input_bim = load_bim(file_path=file_path)
-    output_bim = {}
     if input[0] != 0:
         return (input[0], {}, input[2])
     
-    # TODO
+    output_bim = {}
+    if not out_path:
+        out_path = file_path
+    if os.path.exists(out_path):
+        return (-1, {}, f'File not found: {out_path}')
+
+    for table in changes:
+        in_tables = input_bim['model']['tables']
+
+        change_table_name = table['name']
+        in_table = [x for x in in_tables if x['name'] == change_table_name]
+        if len(in_table) > 1:
+            return (-1, {}, f'Invalid model as input duplicates table: {change_table_name}')
+
+        if len(in_table) == 0:
+            #new table
+            in_tables.append(table)
+        else:
+            in_table = in_table[0]
+            # existing table
+            in_table_columns = in_tables['columns']
+            for column in table['columns']:
+                change_colum_name = column['name']
+                in_colum = [x for x in in_table_columns if x['name'] == change_colum_name]
+                if len(in_colum) > 1:
+                    return (-1, {}, f'Invalid model as input duplicates column: {change_colum_name}')
+                    
+                if len(in_colum) == 0:
+                    #new column
+                    in_table_columns.append(column)
+                else:
+                    in_colum = in_colum[0]
+                    # existing column
+                    in_colum['dataType'] = column['dataType'] or in_colum['dataType']
+                    in_colum['isHidden'] = column['isHidden'] or in_colum['isHidden']
+                    in_colum['sourceColumn'] = column['sourceColumn'] or in_colum['sourceColumn']
+                    in_colum['sourceProviderType'] = column['sourceProviderType'] or in_colum['sourceProviderType']
+                    in_colum['summarizeBy'] = column['summarizeBy'] or in_colum['summarizeBy']
 
     return (0, output_bim, None)
