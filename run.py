@@ -1,8 +1,3 @@
-# from snowbim import snowbim
-# changes = snowbim.get_schema_changes()
-# print(changes)
-
-from snowbim.engines import bimengine
-r = bimengine.upgrade_bim(file_path='', out_path=None, changes=[])
-print(type(r[0]))
-print(type(r[1]))
+from snowbim import snowbim
+snowbim.upgrade_schema( bim_path=None, 
+                        out_bim_path=r'C:\Users\DatNguyen\OneDrive - Portt\Documents\dat.nguyen\Analytics 2.0\PowerBITabularModel_upgrade.bim')
