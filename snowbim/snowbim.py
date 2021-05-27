@@ -1,8 +1,8 @@
 from snowbim.engines import snowengine, bimengine
 
-def get_schema_changes(bim_path=None):
+def get_schema_changes(bim_path=None, profile:str=None, target:str=None, db:str=None, schema:str=None):
     print('Connecting to Snowflake...')
-    conn = snowengine.connect(profile=None, target='cidevelop', db='DEV_DAT_CUSTOMER', schema='SUPPLIER')
+    conn = snowengine.connect(profile=profile, target=target, db=db, schema=schema)
     print('     Connected')
 
     print('Schema comparing...')
@@ -11,8 +11,8 @@ def get_schema_changes(bim_path=None):
 
     return changes
 
-def upgrade_schema(bim_path=None, out_bim_path=None):
-    changes = get_schema_changes(bim_path=bim_path)
+def upgrade_schema(bim_path=None, out_bim_path=None, profile:str=None, target:str=None, db:str=None, schema:str=None):
+    changes = get_schema_changes(bim_path=bim_path, profile=profile, target=target, db=db, schema=schema)
     if changes[0] == 0:
         changes = changes[1]
     else:
