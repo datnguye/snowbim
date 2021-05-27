@@ -65,11 +65,16 @@ def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}):
     if not out_path:
         out_path = file_path
     
+    # completely new model
     if not input_bim['model']:
         output_bim['model']['tables'] = changes['model']['tables']
+        
+    # upgrade model
     else:
+        output_bim = input_bim
+
         in_tables = input_bim['model']['tables']
-        for table in changes['tables']:
+        for table in changes['model']['tables']:
             change_table_name = table['name']
             in_table = [x for x in in_tables if x['name'] == change_table_name]
             if len(in_table) > 1:
@@ -99,7 +104,6 @@ def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}):
                         in_colum['dataType'] = column['dataType'] or in_colum['dataType']
                         in_colum['isHidden'] = column['isHidden'] or in_colum['isHidden']
                         in_colum['sourceColumn'] = column['sourceColumn'] or in_colum['sourceColumn']
-                        in_colum['sourceProviderType'] = column['sourceProviderType'] or in_colum['sourceProviderType']
                 
                 # existing table \ partitions
                 in_table_partitions = in_tables['partitions']

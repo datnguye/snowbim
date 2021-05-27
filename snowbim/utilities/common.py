@@ -38,3 +38,24 @@ def get_model_datatype(in_type:str=None):
 
     return datatype
     
+
+def get_model_datatype(in_type:str=None):
+    if in_type is None:
+        return 'string'
+
+    mapping = [
+        ('text',            'string'),
+        ('boolean',         'boolean'),
+        ('timestamp_ntz',   'dateTime'),
+        ('timestamp_ltz',   'dateTime'),
+        ('date',            'dateTime'),
+        ('number',          'double')
+    ]
+
+    datatype = [x[1] for x in mapping if x[0] == in_type.lower()]
+    if datatype is None or len(datatype) == 0:
+        return in_type.lower()
+    else:
+        datatype = datatype[0]
+
+    return datatype

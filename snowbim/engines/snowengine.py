@@ -70,10 +70,10 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
     snowflake_schema = []
     cur = snowflake_conn.cursor()
 
-    cur.execute(f'SELECT * FROM "INFORMATION_SCHEMA"."TABLES" WHERE TABLE_SCHEMA = \'{snowflake_conn.schema}\'')
+    cur.execute(f'SELECT * FROM "INFORMATION_SCHEMA"."TABLES" WHERE "TABLE_SCHEMA" = \'{snowflake_conn.schema}\' ORDER BY "TABLE_SCHEMA", "TABLE_NAME"')
     df_tables = cur.fetch_pandas_all()
 
-    cur.execute(f'SELECT * FROM "INFORMATION_SCHEMA"."COLUMNS" WHERE TABLE_SCHEMA = \'{snowflake_conn.schema}\'')
+    cur.execute(f'SELECT * FROM "INFORMATION_SCHEMA"."COLUMNS" WHERE "TABLE_SCHEMA" = \'{snowflake_conn.schema}\' ORDER BY "TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME"')
     df_columns = cur.fetch_pandas_all()
 
     for index, item in df_tables.iterrows():
@@ -108,8 +108,7 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
                 "name": citem['COLUMN_NAME'],
                 "is_new": 1,
                 "dataType": citem['DATA_TYPE'],
-                "sourceColumn": citem['COLUMN_NAME'],
-                "sourceProviderType": "nvarchar(32)"
+                "sourceColumn": citem['COLUMN_NAME']
             })
         snowflake_schema.append(table_item)
     

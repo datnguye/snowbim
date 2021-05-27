@@ -18,7 +18,7 @@ def upgrade_schema(bim_path=None, out_bim_path=None):
     else:
         return (changes[0], {}, changes[2])
 
-    print(f"Changes detected as:")
+    print(f"Changes detected as: { 'Up-to-date' if len(changes['model']['tables']) == 0 else ''}")
     for table in changes['model']['tables']:
         print(f"    Table: {table['name']} {'(New)' if table['is_new'] else '(Changed)'}")
         del table['is_new']
@@ -28,9 +28,11 @@ def upgrade_schema(bim_path=None, out_bim_path=None):
         for partition in table['partitions']:
             print(f"        Partition: {partition['name']} {'(New)' if partition['is_new'] else '(Changed)'}")
             del partition['is_new']
-            
-    print('Upgrading...')
-    r = bimengine.upgrade_bim(file_path=bim_path, out_path=out_bim_path, changes=changes)
-    print('     Done')
 
-    return r
+    if len(changes['model']['tables']):
+        print('Upgrading...')
+        r = bimengine.upgrade_bim(file_path=bim_path, out_path=out_bim_path, changes=changes)
+        print('     Done')
+        return r
+
+    return (0,{},None)
