@@ -88,7 +88,7 @@ def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}):
 
                 # existing table
                 # existing table \ columns
-                in_table_columns = in_tables['columns']
+                in_table_columns = in_table['columns']
                 for column in table['columns']:
                     change_colum_name = column['name']
                     in_colum = [x for x in in_table_columns if x['name'] == change_colum_name]
@@ -106,7 +106,7 @@ def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}):
                         in_colum['sourceColumn'] = column['sourceColumn'] or in_colum['sourceColumn']
                 
                 # existing table \ partitions
-                in_table_partitions = in_tables['partitions']
+                in_table_partitions = in_table['partitions']
                 for partition in table['partitions']:
                     in_partition = [
                         x for x in in_table_partitions 
