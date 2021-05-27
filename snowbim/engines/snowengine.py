@@ -164,6 +164,8 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
                 changes['model']['tables'].append(table)
         else:
             # new table
+            for sfcolumn in sftable['columns']:
+                sfcolumn['dataType'] = common.get_model_datatype(sfcolumn['dataType'])
             changes['model']['tables'].append(sftable)
             
     return (0, changes, None)
