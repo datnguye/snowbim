@@ -8,3 +8,6 @@ Build new dist: python setup.py sdist bdist_wheel
 Upload test: python -m twine upload --repository testpypi dist/*
 
 Upload live: python -m twine upload --skip-existing dist/*
+
+--
+python -m pip install -e C:\Sources\self\snowbim\dist

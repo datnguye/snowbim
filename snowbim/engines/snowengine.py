@@ -8,26 +8,30 @@ from yaml.loader import FullLoader
 from snowbim.utilities import common
 
 
-def connect(profile:str=None, project_name:str=None, target:str=None, db:str=None, schema:str=None):
+def connect(profile_dir:str=None, profile:str=None, target:str=None, db:str=None, schema:str=None):
     '''
     Use dbt profiles.yml to connect snowflake database
     Returns a tuple (code, snowflake connection, message)
     '''
     conn = {}
 
-    if profile is None:
-        profile = f'{expanduser("~")}/.dbt/profiles.yml'
+    profile_path = ''
+    if not profile_dir:
+        profile_path = f'{expanduser("~")}/.dbt/profiles.yml'
+    else:
+        profile_path = f'{profile_dir}/profiles.yml'
+    print(f'dbt profile was found at: {profile_path}')
 
-    with open(profile, 'r') as stream:
+    with open(profile_path, 'r') as stream:
         try:
             cred = yaml.load(stream, Loader=FullLoader)
         except yaml.YAMLError as e:
             return (-1, {}, str(e))
 
-    if project_name is None:
+    if profile is None:
         cred = cred[next(iter(cred))]
     else:
-        cred = cred[project_name]
+        cred = cred[profile]
 
     cred = cred['outputs']
     if target is None:
@@ -36,7 +40,7 @@ def connect(profile:str=None, project_name:str=None, target:str=None, db:str=Non
         cred = cred[target]
 
     if cred is None or cred['type'] != 'snowflake':
-        return (-1, {}, f'Snowflake config not found: project={str(project_name)}, target={str(target)} within profile: {profile}')
+        return (-1, {}, f'Snowflake config not found: project={str(profile)}, target={str(target)} within profile: {profile_path}')
 
     # cred = {'type': 'snowflake', 'account': 'xxx', 'user': 'xxx', 'password': 'xxx', 'role': 'xxx', 'database': 'xxx', 'warehouse': 'xxx', 'schema': 'xxx'}
     conn = sfconn.connect(
