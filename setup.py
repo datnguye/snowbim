@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
      name='snowbim',
-     version='1.0.9',
+     version='1.0.10',
      author='datnguye',
      author_email='datnguyen.it09@gmail.com',
      packages=find_packages(),
