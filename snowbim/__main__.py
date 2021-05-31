@@ -12,8 +12,8 @@ def main():
     parser.add_argument('--target',         help='dbt profile target. Optional, default: dev', type=str, default='dev')
     parser.add_argument('--db',             help='Snowflake database. Optional, default: DEMO_DB', type=str, default='DEMO_DB')
     parser.add_argument('--schema',         help='Snowflake database\'s schema. Optional, default: PUBLIC', type=str, default='PUBLIC')
-    parser.add_argument('--tables_inc',     help='Snowflake tables inclusive. Optional, default: (all)', type=str, default=[])
-    parser.add_argument('--tables_exc',     help='Snowflake tables exclusive. Optional, default: (none)', type=str, default=[])
+    parser.add_argument('--tables_inc',     help='Snowflake tables inclusive. Items are in string splitted by comma. Optional, default: (all)', type=str, default='')
+    parser.add_argument('--tables_exc',     help='Snowflake tables exclusive. Items are in string splitted by comma. Optional, default: (none)', type=str, default='')
 
     args = parser.parse_args()
     snowbim.upgrade_schema( bim_path        = args.bim, 
@@ -23,8 +23,8 @@ def main():
                             target          = args.target,
                             db              = args.db,
                             schema          = args.schema,
-                            tables          = args.tables_inc,
-                            exclude_tables  = args.tables_exc)
+                            tables          = [x.strip() for x in args.tables_inc.split(',')] if args.tables_inc else [],
+                            exclude_tables  = [x.strip() for x in args.tables_exc.split(',')] if args.tables_exc else [])
 
 if __name__ == '__main__':
     main()

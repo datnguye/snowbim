@@ -76,13 +76,13 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
 
     filterred_tables_string = "1 = 1"
     filterred_exctables_string = "1 = 1"
-    if not tables and len(tables) > 0:
+    if tables and len(tables) > 0:
         filterred_tables_string = ','.join(tables)
         filterred_tables_string = filterred_tables_string.replace(',',"','")
         filterred_tables_string = f"\"TABLE_NAME\" IN ('{filterred_tables_string}')"
-    if not exclude_tables and len(exclude_tables) > 0:
+    if exclude_tables and len(exclude_tables) > 0:
         filterred_exctables_string = ','.join(exclude_tables)
-        filterred_exctables_string = filterred_tables_string.replace(',',"','")
+        filterred_exctables_string = filterred_exctables_string.replace(',',"','")
         filterred_exctables_string = f"\"TABLE_NAME\" NOT IN ('{filterred_exctables_string}')"
 
     cur.execute(f'''
@@ -97,7 +97,9 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
     df_tables = cur.fetch_pandas_all()
 
     cur.execute(f'''
-        SELECT      "COLUMN_NAME",
+        SELECT      "TABLE_SCHEMA",
+                    "TABLE_NAME",
+                    "COLUMN_NAME",
                     "DATA_TYPE"
         FROM        "INFORMATION_SCHEMA"."COLUMNS" 
         WHERE       "TABLE_SCHEMA" = \'{snowflake_conn.schema}\' 
@@ -106,7 +108,7 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
         ORDER BY    "TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME"
     ''')
     df_columns = cur.fetch_pandas_all()
-
+    
     for index, item in df_tables.iterrows():
         table_item = {
             "name": item['TABLE_NAME'],
