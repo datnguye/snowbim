@@ -56,7 +56,7 @@ def connect(profile_dir:str=None, profile:str=None, target:str=None, db:str=None
     return (0, conn, None)
 
 
-def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', table_excludes:list=[]):
+def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', tables:list=[], exclude_tables:list=[]):
     '''
     Get the changes of snowflake database schema
     Currently support only for
@@ -74,12 +74,41 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
     snowflake_schema = []
     cur = snowflake_conn.cursor()
 
-    cur.execute(f'SELECT * FROM "INFORMATION_SCHEMA"."TABLES" WHERE "TABLE_SCHEMA" = \'{snowflake_conn.schema}\' ORDER BY "TABLE_SCHEMA", "TABLE_NAME"')
+    filterred_tables_string = "1 = 1"
+    filterred_exctables_string = "1 = 1"
+    if tables and len(tables) > 0:
+        filterred_tables_string = ','.join(tables)
+        filterred_tables_string = filterred_tables_string.replace(',',"','")
+        filterred_tables_string = f"\"TABLE_NAME\" IN ('{filterred_tables_string}')"
+    if exclude_tables and len(exclude_tables) > 0:
+        filterred_exctables_string = ','.join(exclude_tables)
+        filterred_exctables_string = filterred_exctables_string.replace(',',"','")
+        filterred_exctables_string = f"\"TABLE_NAME\" NOT IN ('{filterred_exctables_string}')"
+
+    cur.execute(f'''
+        SELECT      "TABLE_NAME",
+                    "TABLE_TYPE"
+        FROM        "INFORMATION_SCHEMA"."TABLES"
+        WHERE       "TABLE_SCHEMA" = \'{snowflake_conn.schema}\'
+            AND     {filterred_tables_string}
+            AND     {filterred_exctables_string}
+        ORDER BY    "TABLE_SCHEMA", "TABLE_NAME"
+    ''')
     df_tables = cur.fetch_pandas_all()
 
-    cur.execute(f'SELECT * FROM "INFORMATION_SCHEMA"."COLUMNS" WHERE "TABLE_SCHEMA" = \'{snowflake_conn.schema}\' ORDER BY "TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME"')
+    cur.execute(f'''
+        SELECT      "TABLE_SCHEMA",
+                    "TABLE_NAME",
+                    "COLUMN_NAME",
+                    "DATA_TYPE"
+        FROM        "INFORMATION_SCHEMA"."COLUMNS" 
+        WHERE       "TABLE_SCHEMA" = \'{snowflake_conn.schema}\' 
+            AND     {filterred_tables_string}
+            AND     {filterred_exctables_string}
+        ORDER BY    "TABLE_SCHEMA", "TABLE_NAME", "COLUMN_NAME"
+    ''')
     df_columns = cur.fetch_pandas_all()
-
+    
     for index, item in df_tables.iterrows():
         table_item = {
             "name": item['TABLE_NAME'],

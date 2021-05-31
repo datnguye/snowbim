@@ -73,3 +73,8 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
+
+## TODO:
+* Adding schema list
+* Support AZ Synapse connector
+
