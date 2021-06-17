@@ -1,4 +1,4 @@
 pyyaml==5.4.1
 certifi==2020.12.5
-snowflake-connector-python==2.4.3
+snowflake-connector-python==2.3.6
 snowflake-connector-python[pandas]

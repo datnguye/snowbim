@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
      name='snowbim',
-     version='1.0.10',
+     version='1.0.11',
      author='datnguye',
      author_email='datnguyen.it09@gmail.com',
      packages=find_packages(),
@@ -13,7 +13,7 @@ setup(
      long_description=open('README.md').read(),
      install_requires=[
         'pyyaml==5.4.1',
-        'snowflake-connector-python==2.4.3',
+        'snowflake-connector-python==2.3.6',
         'snowflake-connector-python[pandas]'
      ],
      python_requires='>=3.7.5',
