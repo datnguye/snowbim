@@ -56,7 +56,7 @@ def connect(profile_dir:str=None, profile:str=None, target:str=None, db:str=None
     return (0, conn, None)
 
 
-def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', tables:list=[], exclude_tables:list=[]):
+def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', tables:list=[], exclude_tables:list=[], replace_partition:bool=False):
     '''
     Get the changes of snowflake database schema
     Currently support only for
@@ -178,19 +178,22 @@ def compare_schema(snowflake_conn, bim_path:str=None, mode:str='directQuery', ta
 
             # partitions
             table['partitions'] = []
-            for sfpartition in sftable['partitions']:
-                in_partition = [
-                    x for x in in_table['partitions']
-                        if len(set(x['source']['expression']).intersection(sfpartition['source']['expression'])) == len(x['source']['expression'])
-                            and x['source']['type'] == sfpartition['source']['type']
-                            and x['mode'] == sfpartition['mode']
-                ]
-                if in_partition:
-                    # existing partition
-                    pass
-                else:
-                    # new partition
-                    table['partitions'].append(sfpartition)
+            if replace_partition:
+                table['partitions'] = sftable['partitions']
+            else:
+                for sfpartition in sftable['partitions']:
+                    in_partition = [
+                        x for x in in_table['partitions']
+                            if len(set(x['source']['expression']).intersection(sfpartition['source']['expression'])) == len(x['source']['expression'])
+                                and x['source']['type'] == sfpartition['source']['type']
+                                and x['mode'] == sfpartition['mode']
+                    ]
+                    if in_partition:
+                        # existing partition
+                        pass
+                    else:
+                        # new partition
+                        table['partitions'].append(sfpartition)
 
             if len(table['columns']) > 0 or len(table['partitions']) > 0:
                 changes['model']['tables'].append(table)

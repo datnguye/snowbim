@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
+from snowbim import __VERSION__, __NAME__
 
 setup(
-     name='snowbim',
-     version='1.0.11',
+     name=__NAME__,
+     version=__VERSION__,
      author='datnguye',
      author_email='datnguyen.it09@gmail.com',
      packages=find_packages(),

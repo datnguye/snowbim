@@ -17,7 +17,7 @@ def load_bim(file_path:str=None):
     return (0, bim, None)
     
 
-def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}):
+def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}, replace_partition:bool=False):
     '''
     With the changes object, make changes for dict's attributes related.
     Currently support only for
@@ -106,21 +106,24 @@ def upgrade_bim(file_path:str=None, out_path:str=None, changes:dict={}):
                         in_colum['sourceColumn'] = column['sourceColumn'] or in_colum['sourceColumn']
                 
                 # existing table \ partitions
-                in_table_partitions = in_table['partitions']
-                for partition in table['partitions']:
-                    in_partition = [
-                        x for x in in_table_partitions 
-                            if len(set(x['source']['expression']).intersection(partition['source']['expression'])) == len(x['source']['expression'])
-                                and x['source']['type'] == partition['source']['type']
-                                and x['mode'] == partition['mode']
-                    ]
-                    
-                    if len(in_partition) == 0:
-                        # existing table \ partitions \ new partition
-                        in_table_partitions.append(partition)
-                    else:
-                        # existing table \ partitions \ existing partition
-                        pass
+                if replace_partition:
+                    in_table['partitions'] = table['partitions']
+                else:
+                    in_table_partitions = in_table['partitions']
+                    for partition in table['partitions']:
+                        in_partition = [
+                            x for x in in_table_partitions 
+                                if len(set(x['source']['expression']).intersection(partition['source']['expression'])) == len(x['source']['expression'])
+                                    and x['source']['type'] == partition['source']['type']
+                                    and x['mode'] == partition['mode']
+                        ]
+                        
+                        if len(in_partition) == 0:
+                            # existing table \ partitions \ new partition
+                            in_table_partitions.append(partition)
+                        else:
+                            # existing table \ partitions \ existing partition
+                            pass
     print(out_path)
     common.save_to_json_file(output_bim, out_path)
     return (0, output_bim, None)
