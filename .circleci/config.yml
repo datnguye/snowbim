@@ -1,0 +1,31 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@1.2
+
+workflows:
+  main:
+    jobs:
+      - build-and-publish
+
+jobs:
+  build-and-publish:
+    docker:
+      - image: cimg/python:3.8
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - run:
+          name: install wheel
+          command: python -m pip install wheel
+      - run:
+          name: install twine
+          command: python -m pip install --upgrade twine
+      - run:
+          name: packing
+          command: python setup.py sdist bdist_wheel
+      - run:
+          name: publish pip
+          command: python -m twine upload --skip-existing dist/* -u datnguye -p $PYPI_PASSWORD --verbose 
+          

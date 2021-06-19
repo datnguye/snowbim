@@ -1,4 +1,6 @@
 # snowbim
+[![CircleCI](https://circleci.com/gh/datnguye/snowbim.svg?style=svg)](https://github.com/datnguye/snowbim#readme)
+
 This is to do something awesome between snowflake database and Power BI tabular model file (.bim).
 
 Those are:
