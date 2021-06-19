@@ -4,7 +4,7 @@ This is to do something awesome between snowflake database and Power BI tabular 
 Those are:
 * Refresh tables (key: name)
 * Refresh table's columns (key: name)
-* Refresh table's partitions (key: name)
+* Refresh table's partitions (key: power-query or name)
 
 Supported Models:
 * Compatibility Level: 1550
